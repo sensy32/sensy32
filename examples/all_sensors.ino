@@ -45,11 +45,11 @@
 #include "Adafruit_LTR390.h" // package needed for UV Sensor
 
 // Board configuration
-String apiKey = "1a1aaef909172cbe0d1bc43441b0b4f290490573"; // Change here your Board API key 
+String apiKey = "board-api-key"; // Change here your Board API key 
 
 // Web Server Configuration
-const char *ssid = "OLINDIAS"; // Change here your Wi-Fi network SSID (name) 
-const char* password = "BABAvv.2700"; // Change here your Wi-Fi network password 
+const char *ssid = "wifi-name"; // Change here your Wi-Fi network SSID (name) 
+const char* password = "wifi-password"; // Change here your Wi-Fi network password  
 const char *server = "https://sensy32.io";
 const int port = 443;
 
