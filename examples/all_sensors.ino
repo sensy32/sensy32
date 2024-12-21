@@ -44,7 +44,7 @@
 #include "SparkFunBME280.h"  // package needed for Temperature - Humidity Sensor
 #include "Adafruit_LTR390.h" // package needed for UV Sensor
 
-// Board configuration
+//Board configuration
 String apiKey = "board-api-key"; // Change here your Board API key 
 
 // Web Server Configuration
@@ -54,8 +54,7 @@ const char *server = "https://sensy32.io";
 const int port = 443;
 
 // Sensors Configurations
-BNO08x myIMUAcc; // accelerometer
-BNO08x myIMUOr; // orientation
+BNO08x myIMU; // accelerometer & orientation
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591); // light // pass in a number for the sensor identifier (for your use later) 
 STHS34PF80_I2C mySensorMo; // motion
 BMP388_DEV bmp388; // pressure and altitude
@@ -119,8 +118,16 @@ bool lastPowerState = true;    // Toggle between "On" and "Sleep"
 // Global Variable Definitions
 int16_t presenceVal = 0; // presence sensor
 volatile boolean dataReady = false; // pressure and altitude sensor
-float temperature, pressure, altitude; // pressure and altitude sensor
+float temperature, pressure, altitude, humidity, uvData, lux;
+float quatI, quatJ, quatK, quatReal, accuracy;
+float valX, valY, valZ;
+uint16_t ir, full, visible;
+
 int int_pin = 33; // pressure and altitude sensor
+
+int currentPage = 0;  // Variable to track the current page
+unsigned long lastPageSwitch = 0;  // Timestamp for the last page switch
+const unsigned long pageDuration = 10000;  // Time to show each page (milliseconds)
 
 void setupWiFi() {
   Serial.print("Connecting to ");
@@ -153,6 +160,20 @@ void setupLcd() {
     oledWriteString(&ssoled, 0, 0, 0, msgs[rc], FONT_NORMAL, 0, 1);
     oledSetBackBuffer(&ssoled, ucBackBuffer);
     delay(2000);
+  }
+}
+
+// Here is where you define the sensor outputs you want to receive
+void setReports(void) {
+  Serial.println("Setting desired reports");
+  if (myIMU.enableAccelerometer() == true) {
+    Serial.println(F("Accelerometer enabled"));
+    Serial.println(F("Output in form x, y, z, in m/s^2"));
+  } else if(myIMU.enableRotationVector() == true) {
+    Serial.println(F("Rotation vector enabled"));
+    Serial.println(F("Output in form i, j, k, real, accuracy"));
+  }else {
+    Serial.println("Could not enable accelerometer or rotation vector");
   }
 }
 
@@ -242,6 +263,19 @@ void setup() {
     ltr.configInterrupt(true, LTR390_MODE_UVS);
   }
 
+  // acccelerometer and orientation
+  // if (myIMU.begin() == false) {
+  //   Serial.println("BNO08x not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
+  //   while (1);
+  // }else if (myIMU.begin(BNO08X_ADDR, Wire, BNO08X_INT, BNO08X_RST) == false) {
+  //   Serial.println("BNO08x not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
+  //   while (1);
+  // }else if(myIMU.begin()==true && myIMU.begin(BNO08X_ADDR, Wire, BNO08X_INT, BNO08X_RST)==true){
+  //   Serial.println("BNO08x found!");
+  //   setReports();
+  //   lastMillis = millis();
+  // }
+
   setupLcd();
 }
 
@@ -317,9 +351,10 @@ void getLight(void){
   // More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
   // That way you can do whatever math and comparisons you want!
   uint32_t lum = tsl.getFullLuminosity();
-  uint16_t ir, full;
   ir = lum >> 16;
   full = lum & 0xFFFF;
+  visible = full - ir;
+  lux = tsl.calculateLux(full, ir);
   Serial.print(F("[ "));
   Serial.print(millis());
   Serial.print(F(" ms ] "));
@@ -330,30 +365,32 @@ void getLight(void){
   Serial.print(full);
   Serial.print(F("  "));
   Serial.print(F("Visible: "));
-  Serial.print(full - ir);
+  Serial.print(visible);
   Serial.print(F("  "));
   Serial.print(F("Lux: "));
-  Serial.println(tsl.calculateLux(full, ir), 6);
-  // float lux = tsl.calculateLux(full, ir);
+  Serial.println(lux, 6);
 }
 
 void getPressureAltitude(void) {
-  if (dataReady) {
+  // if (dataReady) {
     bmp388.getMeasurements(temperature, pressure, altitude);  // Read the measurements
+    Serial.print("Temperature: ");
     Serial.print(temperature);                                // Display the results
     Serial.print(F("*C   "));
+    Serial.print(" Pressure: ");
     Serial.print(pressure);
     Serial.print(F("hPa   "));
+    Serial.print(" Altitude: ");
     Serial.print(altitude);
     Serial.println(F("m"));
-    dataReady = false;  // Clear the dataReady flag
-  }
+  //   dataReady = false;  // Clear the dataReady flag
+  // }
 }
 
 void getTemperatureHumidityData(void){
   //float temperature = mySensorTem.readTempF(); 
-  float temperature = mySensorTem.readTempC();
-  float humidity = mySensorTem.readFloatHumidity();
+  temperature = mySensorTem.readTempC();
+  humidity = mySensorTem.readFloatHumidity();
   float pressure = mySensorTem.readFloatPressure();
   float altitude = mySensorTem.readFloatAltitudeFeet();
   if (isnan(temperature) || isnan(humidity) || isnan(pressure) || isnan(altitude)) {
@@ -380,27 +417,114 @@ void getTemperatureHumidityData(void){
 
 void getUvSensorData(void){
   Serial.print("UV data: ");
-  float uvData = ltr.readUVS();
+  uvData = ltr.readUVS();
   Serial.println(uvData);
+}
+
+void getMotionData(void){
+  sths34pf80_tmos_drdy_status_t dataReady;
+  mySensorMo.getDataReady(&dataReady);
+  mySensorMo.getPresenceValue(&presenceVal);
+  Serial.print("Presence Value: ");
+  Serial.println(presenceVal);
+}
+
+void sendDataToLcd() {
+  int i, x, y;
+  char szTemp[32];
+  unsigned long ms;
+  unsigned long now = millis();
+
+  // Check if it's time to switch the page
+  if (now - lastPageSwitch > pageDuration) {
+    lastPageSwitch = now;  // Update timestamp
+    currentPage = (currentPage + 1) % 4;  // Cycle through 4 pages (0 to 3)
+  }
+
+  // Clear the OLED display before drawing new content
+  oledFill(&ssoled, 0x0, 1);
+
+  // Display content based on the current page
+  switch (currentPage) {
+    case 0:  // Light page
+      oledWriteString(&ssoled, 0, 3, 1, (char *)"IR:", FONT_SMALL, 0, 1);
+      dtostrf(ir, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 50, 1, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 3, 3, (char *)"Full:", FONT_SMALL, 0, 1);
+      dtostrf(full, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 50, 3, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 3, 5, (char *)"Visible:", FONT_SMALL, 0, 1);
+      dtostrf(visible, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 50, 5, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 3, 7, (char *)"Lux:", FONT_SMALL, 0, 1);
+      dtostrf(lux, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 50, 7, szTemp, FONT_SMALL, 0, 1);
+      break;
+
+    case 1:  // Altitude & pressure page
+      oledWriteString(&ssoled, 0, 3, 3, (char *)"Altitude:", FONT_SMALL, 0, 1);
+      dtostrf(altitude, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 54, 3, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 3, 5, (char *)"Pressure:", FONT_SMALL, 0, 1);
+      dtostrf(pressure, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 54, 5, szTemp, FONT_SMALL, 0, 1);
+      break;
+
+    case 2:  // Temperature & humidity page
+      oledWriteString(&ssoled, 0, 3, 3, (char *)"Temperature:", FONT_SMALL, 0, 1);
+      dtostrf(temperature, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 60, 3, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 3, 5, (char *)"Humidity:", FONT_SMALL, 0, 1);
+      dtostrf(humidity, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 60, 5, szTemp, FONT_SMALL, 0, 1);
+      break;
+
+    case 3:  // UV & Presence page
+      oledWriteString(&ssoled, 0, 3, 3, (char *)"UV:", FONT_SMALL, 0, 1);
+      dtostrf(uvData, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 60, 3, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 3, 5, (char *)"Presence:", FONT_SMALL, 0, 1);
+      dtostrf(presenceVal, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 60, 5, szTemp, FONT_SMALL, 0, 1);
+      break;
+  }
 }
 
 void loop() {
 
+  Serial.println();
+
   // light sensor
-  Serial.println(F("------------------------------------"));
+  Serial.println(F("------------------------- Light Sensor --------------------------"));
   getLight();
-  
+  Serial.println();
+
   // altitude and pressure sensor
-  Serial.println(F("------------------------------------"));
+  Serial.println(F("---------------- Pressure and Altitude Sensor --------------------"));
   getPressureAltitude();
+  Serial.println();
 
   // temperature and humidity sensor
-  Serial.println(F("------------------------------------"));
+  Serial.println(F("---------------- Temperature and Humidity Sensor ------------------"));
   getTemperatureHumidityData();
+  Serial.println();
 
   // uv sensor
-  Serial.println(F("------------------------------------"));
+  Serial.println(F("----------------------------- UV Sensor ---------------------------"));
   getUvSensorData();
+  Serial.println();
 
-  delay(50);
+  // motion sensor
+  Serial.println(F("------------------------- Motion Sensor --------------------------"));
+  getMotionData();
+  Serial.println();
+
+  sendDataToLcd();
+  // delay(200);
 }
