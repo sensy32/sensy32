@@ -109,9 +109,6 @@ SSOLED ssoled;
 #define BNO08X_RST 35
 //#define BNO08X_RST  -1
 
-unsigned long lastMillis = 0;  // Keep track of time
-bool lastPowerState = true;    // Toggle between "On" and "Sleep"
-
 #define BNO08X_ADDR 0x4B  // SparkFun BNO08x Breakout (Qwiic) defaults to 0x4B
 //#define BNO08X_ADDR 0x4A // Alternate address if ADR jumper is closed 
 
@@ -119,7 +116,7 @@ bool lastPowerState = true;    // Toggle between "On" and "Sleep"
 int16_t presenceVal = 0; // presence sensor
 volatile boolean dataReady = false; // pressure and altitude sensor
 float temperature, pressure, altitude, humidity, uvData, lux;
-float quatI, quatJ, quatK, quatReal, accuracy;
+float quatI, quatJ, quatK, quatReal, quatRadianAccuracy;
 float valX, valY, valZ;
 uint16_t ir, full, visible;
 
@@ -166,70 +163,75 @@ void setupLcd() {
 // Here is where you define the sensor outputs you want to receive
 void setReports(void) {
   Serial.println("Setting desired reports");
+
+  // Enable accelerometer
   if (myIMU.enableAccelerometer() == true) {
-    Serial.println(F("Accelerometer enabled"));
-    Serial.println(F("Output in form x, y, z, in m/s^2"));
-  } else if(myIMU.enableRotationVector() == true) {
-    Serial.println(F("Rotation vector enabled"));
-    Serial.println(F("Output in form i, j, k, real, accuracy"));
-  }else {
-    Serial.println("Could not enable accelerometer or rotation vector");
+    Serial.println("Accelerometer enabled");
+    Serial.println("Output: x, y, z (m/s^2)");
+  } else {
+    Serial.println("Could not enable accelerometer");
+  }
+
+  // Enable rotation vector
+  if (myIMU.enableRotationVector() == true) {
+    Serial.println("Rotation vector enabled");
+    Serial.println("Output: i, j, k, real, accuracy");
+  } else {
+    Serial.println("Could not enable rotation vector");
   }
 }
 
 void setup() {
-  Serial.begin(115200);
-  setupWiFi();
-  Serial.println();
-  Wire.begin(7, 6);
+    Serial.begin(115200);
+    setupWiFi();
+    Serial.println();
+    Wire.begin(7, 6);
 
-  // light 
-  if(tsl.begin()==false){
-    Serial.println("No sensor for Light found ... check your wiring?");
-    while (1);
-  } else if(tsl.begin()==true){
+    while (!Serial) delay(10); // Wait for Serial to become available
+
+    mySensorTem.setI2CAddress(0x76); // Initialize Temperature/Humidity Sensor
+
+    if(tsl.begin()==false){ // light 
+      Serial.println("No sensor for Light found ... check your wiring?");
+      while (1);
+    } else if(mySensorMo.begin()==false){ // motion
+      Serial.println("No sensor for Motion found ... check your wiring?");
+      while (1);
+    }  else if(bmp388.begin()==false){ // pressure and altitude
+      Serial.println("No BMP388 Sensor found for Pressure and Altitude.");
+      while (1); 
+    } else if (mySensorTem.beginI2C(Wire)==false){ // temperature and humidity //Begin communication over I2C
+      Serial.println("No BMP388 Sensor found for Temperature and Humidity.");
+      while (1); 
+    }else if (ltr.begin()==false) { // uv
+      Serial.println("Couldn't find LTR sensor for UV!");
+      while (1);
+    }else if (myIMU.begin() == false) {  // acccelerometer and orientation // BNO08X_ADDR, Wire, BNO08X_INT, BNO08X_RST
+      Serial.println("BNO08x not detected. Check connections. Freezing...");
+      while (1);
+    }
+
+    // light
     Serial.println("Found a TSL2591 for Light sensor.");
-    displaySensorDetails();
-    configureSensor();
-  }
+    displayLightSensorDetails();
+    configureLightSensor();
 
-  // motion
-  if(mySensorMo.begin()==false){
-    Serial.println("No sensor for Motion found ... check your wiring?");
-    while (1);
-  } else if(mySensorMo.begin()==true){
+    // motion
     Serial.println("Found a STHS34PF80_I2C for Motion sensor.");
     Serial.println("Open the Serial Plotter for graphical viewing");
     delay(1000);
-  }
 
-  // pressure and altitude
-  if(bmp388.begin()==false){
-    Serial.println("No BMP388 Sensor found for Pressure and Altitude.");
-    while (1); 
-  }else if(bmp388.begin()==true){ // Default initialisation, place the BMP388 into SLEEP_MODE
+    // pressure and altitude
     bmp388.enableInterrupt();                                                   // Enable the BMP388's interrupt (INT) pin
     attachInterrupt(digitalPinToInterrupt(int_pin), interruptHandler, RISING);  // Set interrupt to call interruptHandler function on D2
     bmp388.setTimeStandby(TIME_STANDBY_1280MS);                                 // Set the standby time to 1.3 seconds
     bmp388.startNormalConversion();                                             // Start BMP388 continuous conversion in NORMAL_MODE
     Serial.println("BMP388 Sensor found for Pressure and Altitude.");
-  }
 
-  // temperature and humidity
-  mySensorTem.setI2CAddress(0x76);
-  if (mySensorTem.beginI2C(Wire)==false){ //Begin communication over I2C
-    Serial.println("No BMP388 Sensor found for Temperature and Humidity.");
-    while (1);  //Freeze
-  }else if(mySensorTem.beginI2C(Wire)==true){
-    Serial.println("BMP388 Sensor found for Temperature and Humidity.");
-  }
+    // temperature and humidity
+    Serial.println("BME280 Sensor found for Temperature and Humidity.");
 
-  // uv 
-  if (ltr.begin()==false) {
-    Serial.println("Couldn't find LTR sensor for UV!");
-    while (1);
-  }else if(ltr.begin()==true){
-
+    // uv 
     Serial.println("Found a LTR sensor for UV!");
     ltr.setMode(LTR390_MODE_UVS);
     if (ltr.getMode() == LTR390_MODE_ALS) {
@@ -261,25 +263,16 @@ void setup() {
 
     ltr.setThresholds(100, 1000);
     ltr.configInterrupt(true, LTR390_MODE_UVS);
-  }
 
-  // acccelerometer and orientation
-  // if (myIMU.begin() == false) {
-  //   Serial.println("BNO08x not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
-  //   while (1);
-  // }else if (myIMU.begin(BNO08X_ADDR, Wire, BNO08X_INT, BNO08X_RST) == false) {
-  //   Serial.println("BNO08x not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
-  //   while (1);
-  // }else if(myIMU.begin()==true && myIMU.begin(BNO08X_ADDR, Wire, BNO08X_INT, BNO08X_RST)==true){
-  //   Serial.println("BNO08x found!");
-  //   setReports();
-  //   lastMillis = millis();
-  // }
+    // acccelerometer and orientation
+    Serial.println("BNO08x found!");
+    setReports();
+
 
   setupLcd();
 }
 
-void displaySensorDetails(void) {
+void displayLightSensorDetails(void) {
   sensor_t sensor;
   tsl.getSensor(&sensor);
   Serial.println(F("------------------------------------"));
@@ -307,7 +300,7 @@ void interruptHandler() { // Interrupt handler function
   dataReady = true;  // Set the dataReady flag
 }
 
-void configureSensor(void) {
+void configureLightSensor(void) {
   // You can change the gain on the fly, to adapt to brighter/dimmer light situations
   //tsl.setGain(TSL2591_GAIN_LOW);    // 1x gain (bright light)
   tsl.setGain(TSL2591_GAIN_MED);  // 25x gain
@@ -347,7 +340,7 @@ void configureSensor(void) {
   Serial.println(F(""));
 }
 
-void getLight(void){
+void getLightData(void){
   // More advanced data read example. Read 32 bits with top 16 bits IR, bottom 16 bits full spectrum
   // That way you can do whatever math and comparisons you want!
   uint32_t lum = tsl.getFullLuminosity();
@@ -371,7 +364,7 @@ void getLight(void){
   Serial.println(lux, 6);
 }
 
-void getPressureAltitude(void) {
+void getPressureAltitudeData(void) {
   // if (dataReady) {
     bmp388.getMeasurements(temperature, pressure, altitude);  // Read the measurements
     Serial.print("Temperature: ");
@@ -427,6 +420,54 @@ void getMotionData(void){
   mySensorMo.getPresenceValue(&presenceVal);
   Serial.print("Presence Value: ");
   Serial.println(presenceVal);
+}
+
+void getAccelerometerOrientationData(void){
+  // Check if the sensor has been reset
+
+  if (myIMU.wasReset()) {
+    Serial.println("Sensor was reset. Re-enabling reports...");
+    setReports();
+  }
+
+  // Check if a new sensor event has occurred
+  if (myIMU.getSensorEvent() == true) {
+    // Handle accelerometer data
+    if (myIMU.getSensorEventID() == SENSOR_REPORTID_ACCELEROMETER) {
+      valX = myIMU.getAccelX();
+      valY = myIMU.getAccelY();
+      valZ = myIMU.getAccelZ();
+
+      Serial.print("Accelerometer: ");
+      Serial.print("X=");
+      Serial.print(valX, 2);
+      Serial.print(" Y=");
+      Serial.print(valY, 2);
+      Serial.print(" Z=");
+      Serial.println(valZ, 2);
+    }
+
+    // Handle rotation vector data
+    if (myIMU.getSensorEventID() == SENSOR_REPORTID_ROTATION_VECTOR) {
+      quatI = myIMU.getQuatI();
+      quatJ = myIMU.getQuatJ();
+      quatK = myIMU.getQuatK();
+      quatReal = myIMU.getQuatReal();
+      quatRadianAccuracy = myIMU.getQuatRadianAccuracy();
+
+      Serial.print("Rotation Vector: ");
+      Serial.print("i=");
+      Serial.print(quatI, 2);
+      Serial.print(" j=");
+      Serial.print(quatJ, 2);
+      Serial.print(" k=");
+      Serial.print(quatK, 2);
+      Serial.print(" real=");
+      Serial.print(quatReal, 2);
+      Serial.print(" accuracy=");
+      Serial.println(quatRadianAccuracy, 2);
+    }
+  }
 }
 
 void sendDataToLcd() {
@@ -502,12 +543,12 @@ void loop() {
 
   // light sensor
   Serial.println(F("------------------------- Light Sensor --------------------------"));
-  getLight();
+  getLightData();
   Serial.println();
 
   // altitude and pressure sensor
   Serial.println(F("---------------- Pressure and Altitude Sensor --------------------"));
-  getPressureAltitude();
+  getPressureAltitudeData();
   Serial.println();
 
   // temperature and humidity sensor
@@ -525,6 +566,10 @@ void loop() {
   getMotionData();
   Serial.println();
 
+  // accelerometer and orientation sensor
+  Serial.println(F("------------- Accelerometer and Orientation Sensor ---------------"));
+  getAccelerometerOrientationData();
+  Serial.println();
+
   sendDataToLcd();
-  // delay(200);
 }
