@@ -9,7 +9,7 @@
   This code reads data from BME280 sensor and sends it to a web server (https://sensy32.io) and displays it on an OLED screen.
 
   BNO08x Sensor Data Transmission Example with Sensy Board
-  This code reads data from BNO08x sensor and sends it to a web server and displays it on an OLED screen.
+  This code reads accelerometer and orientation data from BNO08x sensor and sends it to a web server and displays it on an OLED screen.
 
   STHS34PF80 Sensor Data Transmission Example with Sensy Board
   This code reads data from STHS34PF80 sensor and sends it to a web server (https://sensy32.io) and displays it on an OLED screen.
@@ -18,9 +18,6 @@
   This code reads data from TSL2591 light sensor and sends it to a web server (https://sensy32.io) and displays it on an OLED screen.
   Dynamic Range: 600M:1 
   Maximum Lux: 88K 
-
-  BNO08x Sensor Data Transmission Example with Sensy Board
-  This code reads accelerometer data from the BNO08x sensor, displays it on an OLED screen, and sends it to a server via WiFi to (https://sensy32.io)
 */
 
 /*
@@ -31,12 +28,12 @@
 #include <HTTPClient.h>
 #include <ss_oled.h>
 
-#include <Wire.h> // package needed for motion, accelerometer, and light Sensors 
+#include <Wire.h> // package needed for motion, accelerometer/orientation, and light Sensors 
 
 /*
   Specific packages for each Sensor 
 */
-#include "SparkFun_BNO08x_Arduino_Library.h" // package needed for Accelerometer and Orientation Sensors // http://librarymanager/All#SparkFun_BNO08x
+#include "SparkFun_BNO08x_Arduino_Library.h" // package needed for Accelerometer - Orientation Sensors // http://librarymanager/All#SparkFun_BNO08x
 #include <Adafruit_Sensor.h> // package needed for Light Sensor
 #include "Adafruit_TSL2591.h" // package needed for Light Sensor
 #include "SparkFun_STHS34PF80_Arduino_Library.h" // package needed for Motion Sensor
@@ -45,11 +42,11 @@
 #include "Adafruit_LTR390.h" // package needed for UV Sensor
 
 //Board configuration
-String apiKey = "board-api-key"; // Change here your Board API key 
+const char *apiKey = "board-api-key"; // Change here your Board API key 
 
 // Web Server Configuration
 const char *ssid = "wifi-name"; // Change here your Wi-Fi network SSID (name) 
-const char* password = "wifi-password"; // Change here your Wi-Fi network password  
+const char* password = "wifi-password"; // Change here your Wi-Fi network password 
 const char *server = "https://sensy32.io";
 const int port = 443;
 
@@ -99,20 +96,7 @@ static uint8_t *ucBackBuffer = NULL;
 
 SSOLED ssoled;
 
-// For reliable interaction with the SHTP bus, we need
-// to use hardware reset control, and monitor the H_INT pin
-// The H_INT pin will go low when its okay to talk on the SHTP bus.
-// Note, these can be other GPIO if you like.
-// Do not define (or set to -1) to not user these features.
-#define BNO08X_INT 34
-//#define BNO08X_INT  -1
-#define BNO08X_RST 35
-//#define BNO08X_RST  -1
-
-#define BNO08X_ADDR 0x4B  // SparkFun BNO08x Breakout (Qwiic) defaults to 0x4B
-//#define BNO08X_ADDR 0x4A // Alternate address if ADR jumper is closed 
-
-// Global Variable Definitions
+// Global Variables Definition
 int16_t presenceVal = 0; // presence sensor
 volatile boolean dataReady = false; // pressure and altitude sensor
 float temperature, pressure, altitude, humidity, uvData, lux;
@@ -124,7 +108,7 @@ int int_pin = 33; // pressure and altitude sensor
 
 int currentPage = 0;  // Variable to track the current page
 unsigned long lastPageSwitch = 0;  // Timestamp for the last page switch
-const unsigned long pageDuration = 10000;  // Time to show each page (milliseconds)
+const unsigned long pageDuration = 5000;  // Time to show each page (milliseconds)
 
 void setupWiFi() {
   Serial.print("Connecting to ");
@@ -206,7 +190,7 @@ void setup() {
     }else if (ltr.begin()==false) { // uv
       Serial.println("Couldn't find LTR sensor for UV!");
       while (1);
-    }else if (myIMU.begin() == false) {  // acccelerometer and orientation // BNO08X_ADDR, Wire, BNO08X_INT, BNO08X_RST
+    }else if (myIMU.begin() == false) {  // acccelerometer and orientation
       Serial.println("BNO08x not detected. Check connections. Freezing...");
       while (1);
     }
@@ -365,7 +349,6 @@ void getLightData(void){
 }
 
 void getPressureAltitudeData(void) {
-  // if (dataReady) {
     bmp388.getMeasurements(temperature, pressure, altitude);  // Read the measurements
     Serial.print("Temperature: ");
     Serial.print(temperature);                                // Display the results
@@ -376,8 +359,6 @@ void getPressureAltitudeData(void) {
     Serial.print(" Altitude: ");
     Serial.print(altitude);
     Serial.println(F("m"));
-  //   dataReady = false;  // Clear the dataReady flag
-  // }
 }
 
 void getTemperatureHumidityData(void){
@@ -479,7 +460,7 @@ void sendDataToLcd() {
   // Check if it's time to switch the page
   if (now - lastPageSwitch > pageDuration) {
     lastPageSwitch = now;  // Update timestamp
-    currentPage = (currentPage + 1) % 4;  // Cycle through 4 pages (0 to 3)
+    currentPage = (currentPage + 1) % 7;  // Cycle through 6 pages (0 to 6)
   }
 
   // Clear the OLED display before drawing new content
@@ -508,31 +489,69 @@ void sendDataToLcd() {
     case 1:  // Altitude & pressure page
       oledWriteString(&ssoled, 0, 3, 3, (char *)"Altitude:", FONT_SMALL, 0, 1);
       dtostrf(altitude, 10, 2, szTemp);
-      oledWriteString(&ssoled, 0, 54, 3, szTemp, FONT_SMALL, 0, 1);
+      oledWriteString(&ssoled, 0, 56, 3, szTemp, FONT_SMALL, 0, 1);
 
       oledWriteString(&ssoled, 0, 3, 5, (char *)"Pressure:", FONT_SMALL, 0, 1);
       dtostrf(pressure, 10, 2, szTemp);
-      oledWriteString(&ssoled, 0, 54, 5, szTemp, FONT_SMALL, 0, 1);
+      oledWriteString(&ssoled, 0, 56, 5, szTemp, FONT_SMALL, 0, 1);
       break;
 
     case 2:  // Temperature & humidity page
-      oledWriteString(&ssoled, 0, 3, 3, (char *)"Temperature:", FONT_SMALL, 0, 1);
+      oledWriteString(&ssoled, 0, 3, 3, (char *)"Temp:", FONT_SMALL, 0, 1);
       dtostrf(temperature, 10, 2, szTemp);
-      oledWriteString(&ssoled, 0, 60, 3, szTemp, FONT_SMALL, 0, 1);
+      oledWriteString(&ssoled, 0, 56, 3, szTemp, FONT_SMALL, 0, 1);
 
       oledWriteString(&ssoled, 0, 3, 5, (char *)"Humidity:", FONT_SMALL, 0, 1);
       dtostrf(humidity, 10, 2, szTemp);
-      oledWriteString(&ssoled, 0, 60, 5, szTemp, FONT_SMALL, 0, 1);
+      oledWriteString(&ssoled, 0, 56, 5, szTemp, FONT_SMALL, 0, 1);
       break;
 
     case 3:  // UV & Presence page
       oledWriteString(&ssoled, 0, 3, 3, (char *)"UV:", FONT_SMALL, 0, 1);
       dtostrf(uvData, 10, 2, szTemp);
-      oledWriteString(&ssoled, 0, 60, 3, szTemp, FONT_SMALL, 0, 1);
+      oledWriteString(&ssoled, 0, 56, 3, szTemp, FONT_SMALL, 0, 1);
 
       oledWriteString(&ssoled, 0, 3, 5, (char *)"Presence:", FONT_SMALL, 0, 1);
       dtostrf(presenceVal, 10, 2, szTemp);
-      oledWriteString(&ssoled, 0, 60, 5, szTemp, FONT_SMALL, 0, 1);
+      oledWriteString(&ssoled, 0, 56, 5, szTemp, FONT_SMALL, 0, 1);
+      break;
+
+    case 4:  // Accelerometer page
+      oledWriteString(&ssoled, 0, 25, 2, (char *)"X:", FONT_SMALL, 0, 1);
+      dtostrf(valX, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 35, 2, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 25, 4, (char *)"Y:", FONT_SMALL, 0, 1);
+      dtostrf(valY, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 35, 4, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 25, 6, (char *)"Z:", FONT_SMALL, 0, 1);
+      dtostrf(valZ, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 35, 6, szTemp, FONT_SMALL, 0, 1);
+      break;
+
+    case 5:  // Orientation  1st page
+      oledWriteString(&ssoled, 0, 25, 2, (char *)"I:", FONT_SMALL, 0, 1);
+      dtostrf(quatI, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 35, 2, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 25, 4, (char *)"J:", FONT_SMALL, 0, 1);
+      dtostrf(quatJ, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 35, 4, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 25, 6, (char *)"K:", FONT_SMALL, 0, 1);
+      dtostrf(quatK, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 35, 6, szTemp, FONT_SMALL, 0, 1);
+      break;
+    
+    case 6:  // Orientation 2nd page
+      oledWriteString(&ssoled, 0, 3, 3, (char *)"Real:", FONT_SMALL, 0, 1);
+      dtostrf(quatReal, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 56, 3, szTemp, FONT_SMALL, 0, 1);
+
+      oledWriteString(&ssoled, 0, 3, 5, (char *)"Accuracy:", FONT_SMALL, 0, 1);
+      dtostrf(quatRadianAccuracy, 10, 2, szTemp);
+      oledWriteString(&ssoled, 0, 56, 5, szTemp, FONT_SMALL, 0, 1);
       break;
   }
 }
@@ -562,12 +581,12 @@ void loop() {
   Serial.println();
 
   // motion sensor
-  Serial.println(F("------------------------- Motion Sensor --------------------------"));
+  Serial.println(F("-------------------------- Motion Sensor --------------------------"));
   getMotionData();
   Serial.println();
 
   // accelerometer and orientation sensor
-  Serial.println(F("------------- Accelerometer and Orientation Sensor ---------------"));
+  Serial.println(F("------------- Accelerometer and Orientation Sensor ----------------"));
   getAccelerometerOrientationData();
   Serial.println();
 
