@@ -51,7 +51,7 @@ const char *server = "https://sensy32.io";
 const int port = 443;
 
 // Sensors Configurations
-BNO08x myIMU; // accelerometer & orientation
+BNO08x myIMU; // accelerometer and orientation
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591); // light // pass in a number for the sensor identifier (for your use later) 
 STHS34PF80_I2C mySensorMo; // motion
 BMP388_DEV bmp388; // pressure and altitude
