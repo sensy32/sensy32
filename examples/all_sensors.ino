@@ -9,7 +9,7 @@
   This code reads data from BME280 sensor and sends it to a web server (https://sensy32.io) and displays it on an OLED screen.
 
   BNO08x Sensor Data Transmission Example with Sensy Board
-  This code reads accelerometer and orientation data from BNO08x sensor and sends it to a web server and displays it on an OLED screen.
+  This code reads data from BNO08x sensor and sends it to a web server and displays it on an OLED screen.
 
   STHS34PF80 Sensor Data Transmission Example with Sensy Board
   This code reads data from STHS34PF80 sensor and sends it to a web server (https://sensy32.io) and displays it on an OLED screen.
@@ -18,22 +18,18 @@
   This code reads data from TSL2591 light sensor and sends it to a web server (https://sensy32.io) and displays it on an OLED screen.
   Dynamic Range: 600M:1 
   Maximum Lux: 88K 
+
+  BNO08x Sensor Data Transmission Example with Sensy Board
+  This code reads accelerometer data from the BNO08x sensor, displays it on an OLED screen, and sends it to a server via WiFi to (https://sensy32.io)
 */
 
-/*
-  Packages needed for all Sensors 
-*/
-#include <WiFi.h>
-#include <WiFiClientSecure.h> 
-#include <HTTPClient.h>
-#include <ss_oled.h>
-
-#include <Wire.h> // package needed for motion, accelerometer/orientation, and light Sensors 
+#include "config.h" // config file shared between all files
+#include <Wire.h> // package needed for motion, accelerometer, and light Sensors 
 
 /*
   Specific packages for each Sensor 
 */
-#include "SparkFun_BNO08x_Arduino_Library.h" // package needed for Accelerometer - Orientation Sensors // http://librarymanager/All#SparkFun_BNO08x
+#include "SparkFun_BNO08x_Arduino_Library.h" // package needed for Accelerometer and Orientation Sensors // http://librarymanager/All#SparkFun_BNO08x
 #include <Adafruit_Sensor.h> // package needed for Light Sensor
 #include "Adafruit_TSL2591.h" // package needed for Light Sensor
 #include "SparkFun_STHS34PF80_Arduino_Library.h" // package needed for Motion Sensor
@@ -41,58 +37,13 @@
 #include "SparkFunBME280.h"  // package needed for Temperature - Humidity Sensor
 #include "Adafruit_LTR390.h" // package needed for UV Sensor
 
-//Board configuration
-const char *apiKey = "board-api-key"; // Change here your Board API key 
-
-// Web Server Configuration
-const char *ssid = "wifi-name"; // Change here your Wi-Fi network SSID (name) 
-const char* password = "wifi-password"; // Change here your Wi-Fi network password 
-const char *server = "https://sensy32.io";
-const int port = 443;
-
 // Sensors Configurations
-BNO08x myIMU; // accelerometer and orientation
+BNO08x myIMU; // accelerometer & orientation
 Adafruit_TSL2591 tsl = Adafruit_TSL2591(2591); // light // pass in a number for the sensor identifier (for your use later) 
 STHS34PF80_I2C mySensorMo; // motion
 BMP388_DEV bmp388; // pressure and altitude
 BME280 mySensorTem;  // temperature and humidity
 Adafruit_LTR390 ltr = Adafruit_LTR390(); // uv
-
-/*
-  OLED / LCD Configuration
-*/
-
-// if your system doesn't have enough RAM for a back buffer, comment out
-// this line (e.g. ATtiny85)
-#define USE_BACKBUFFER
-
-#ifdef USE_BACKBUFFER
-static uint8_t ucBackBuffer[1024];
-#else
-static uint8_t *ucBackBuffer = NULL;
-#endif
-
-// Use -1 for the Wire library default pins
-// or specify the pin numbers to use with the Wire library or bit banging on any GPIO pins
-// These are the pin numbers for the M5Stack Atom default I2C
-#define SDA_PIN -1
-#define SCL_PIN -1
-// Set this to -1 to disable or the GPIO pin number connected to the reset
-// line of your display if it requires an external reset
-#define RESET_PIN -1
-// let ss_oled figure out the display address
-#define OLED_ADDR -1
-// don't rotate the display
-#define FLIP180 0
-// don't invert the display
-#define INVERT 0
-// Bit-Bang the I2C bus
-#define USE_HW_I2C 1
-
-// Change these if you're using a different OLED display
-#define MY_OLED OLED_128x64
-#define OLED_WIDTH 128
-#define OLED_HEIGHT 64
 
 SSOLED ssoled;
 
@@ -556,6 +507,49 @@ void sendDataToLcd() {
   }
 }
 
+void sendDataToSensy(){
+  if (WiFi.status() == WL_CONNECTED) {
+      WiFiClientSecure client;
+      client.setInsecure();
+      client.connect(server, port);
+
+      String url = String(server) + "/sensors/api/data-all-in-one?apiKey=" + apiKey;
+
+      JsonDocument jsonBody;
+      String jsonBodyString;
+
+      jsonBody["temperature"] = String(temperature);
+      jsonBody["humidity"] = String(humidity);;
+      jsonBody["altitude"] = String(altitude);;
+      jsonBody["pressure"] = String(pressure);
+      jsonBody["accelerometer"] = "{\"X\":\"" + String(valX) + "\",\"Y\":\"" + String(valY) + "\",\"Z\":\"" + String(valZ) + "\"}";
+      jsonBody["motion"] = "{\"presenceVal\":\"" + String(presenceVal) + "\"}";
+      jsonBody["orientation"] = "{\"quatI\":\"" + String(quatI) + "\",\"quatJ\":\"" + String(quatJ) + "\",\"quatK\":\"" + String(quatK) + "\",\"quatReal\":\"" + String(quatReal) + "\",\"quatRadianAccuracy\":\"" + String(quatRadianAccuracy) + "\"}";
+      jsonBody["uv"] = "{\"UV\":\"" + String(uvData) + "\"}";
+      jsonBody["light"] = "{\"IR\":\"" + String(ir) + "\",\"Full\":\"" + String(full) + "\",\"Visible\":\"" + String(visible) + "\",\"Lux\":\"" + String(lux) + "\"}";
+
+      serializeJson(jsonBody, jsonBodyString);
+
+      Serial.println();
+      Serial.println(url);
+      HTTPClient http;
+      http.begin(client, url);
+      http.addHeader("Content-Type", "application/json");
+      Serial.println(jsonBodyString);
+      int httpCode = http.POST(jsonBodyString);     
+      Serial.print("HTTP result: ");
+      Serial.println(httpCode);
+
+      // Print the response to the serial monitor
+      http.writeToStream(&Serial);
+
+      // End the HTTP request
+      http.end();
+  } else {
+    Serial.println("Error in WiFi connection");
+  }
+}
+
 void loop() {
 
   Serial.println();
@@ -591,4 +585,6 @@ void loop() {
   Serial.println();
 
   sendDataToLcd();
+  sendDataToSensy();
 }
+
