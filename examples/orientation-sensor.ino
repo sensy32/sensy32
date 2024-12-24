@@ -8,18 +8,6 @@
 //Sensor Configuration
 BNO08x myIMU;
 
-// For reliable interaction with the SHTP bus, we need
-// to use hardware reset control, and monitor the H_INT pin
-// The H_INT pin will go low when its okay to talk on the SHTP bus.
-// Note, these can be other GPIO if you like.
-// Do not define (or set to -1) to not user these features.
-#define BNO08X_INT 34
-//#define BNO08X_INT  -1
-#define BNO08X_RST 35
-//#define BNO08X_RST  -1
-#define BNO08X_ADDR 0x4B  // SparkFun BNO08x Breakout (Qwiic) defaults to 0x4B
-//#define BNO08X_ADDR 0x4A // Alternate address if ADR jumper is closed 
-
 unsigned long lastMillis = 0;  // Keep track of time
 bool lastPowerState = true;    // Toggle between "On" and "Sleep"
 
@@ -70,11 +58,11 @@ void setup() {
 
   //Wire.begin();
   Wire.begin(7, 6);
-  if (myIMU.begin(BNO08X_ADDR, Wire, BNO08X_INT, BNO08X_RST) == false) {
+  if (myIMU.begin() == false) {
     Serial.println("BNO08x not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
-    while (1)
-      ;
+    while (1);
   }
+  
   Serial.println("BNO08x found!");
   setupLcd();
   setReports();
@@ -93,15 +81,21 @@ void sendDataToSensy(float quatI, float quatJ, float quatK, float quatReal, floa
 
     HTTPClient http;
 
-    // Append query parameters to the URL
-    String url = String(server) + "/sensors/api/data?quatI=" + quatI + "&quatJ=" + quatJ + "&quatK=" + quatK + "&quatReal=" + quatReal + "&quatRadianAccuracy=" + accuracy;
+    String url = String(server) + "/sensors/api/data?apiKey=" + apiKey;
 
+    JsonDocument jsonBody;
+    String jsonBodyString;
+
+    jsonBody["orientation"] = "{\"quatI\":\"" + String(quatI) + "\",\"quatJ\":\"" + String(quatJ) + "\",\"quatK\":\"" + String(quatK) + "\",\"quatReal\":\"" + String(quatReal) + "\",\"quatRadianAccuracy\":\"" + String(accuracy) + "\"}";
+
+    serializeJson(jsonBody, jsonBodyString);
+
+    Serial.println();
+    Serial.println(url);
     http.begin(client, url);
     http.addHeader("Content-Type", "application/json");
-
-    String jsonBody = "{\"api_key\":\"" + apiKey + "\"}";
-    Serial.println(jsonBody);
-    int httpCode = http.POST(jsonBody);     
+    Serial.println(jsonBodyString);
+    int httpCode = http.POST(jsonBodyString);     
     Serial.print("HTTP result: ");
     Serial.println(httpCode);
 
