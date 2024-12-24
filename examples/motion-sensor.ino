@@ -53,18 +53,12 @@ void setup() {
   Serial.println("STHS34PF80 Example 5: Arduino Serial Plotter Output");
   setupWiFi();
 
-  // Begin I2C
-  if (Wire.begin(7, 6) == 0) {
-    Serial.println("I2C Error - check I2C Address");
-    while (1)
-      ;
-  }
+  Wire.begin(7, 6);
 
   // Establish communication with device
-  if (mySensor.begin() != 0) {
+  if (mySensor.begin() == false) {
     Serial.println("Error setting up device - please check wiring.");
-    while (1)
-      ;
+    while (1);
   }
   setupLcd();
 
@@ -91,15 +85,21 @@ void sendDataToSensy(float presenceVal) {
 
     HTTPClient http;
 
-    // Append query parameters to the URL
-    String url = String(server) + "/sensors/api/data?presenceVal=" + presenceVal;
+    String url = String(server) + "/sensors/api/data?apiKey=" + apiKey;
 
+    JsonDocument jsonBody;
+    String jsonBodyString;
+
+    jsonBody["motion"] = "{\"presenceVal\":\"" + String(presenceVal) + "\"}";
+
+    serializeJson(jsonBody, jsonBodyString);
+
+    Serial.println();
+    Serial.println(url);
     http.begin(client, url);
     http.addHeader("Content-Type", "application/json");
-
-    String jsonBody = "{\"api_key\":\"" + apiKey + "\"}";
-    Serial.println(jsonBody);
-    int httpCode = http.POST(jsonBody);     
+    Serial.println(jsonBodyString);
+    int httpCode = http.POST(jsonBodyString);     
     Serial.print("HTTP result: ");
     Serial.println(httpCode);
 
