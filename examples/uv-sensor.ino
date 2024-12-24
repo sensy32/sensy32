@@ -51,7 +51,7 @@ void setup() {
   Wire.begin(7, 6);
   if (!ltr.begin()) {
     Serial.println("Couldn't find LTR sensor!");
-    while (1) delay(10);
+    while (1);
   }
   Serial.println("Found LTR sensor!");
 
@@ -96,14 +96,21 @@ void sendDataToSensy(float uv) {
 
     HTTPClient http;
 
-    // Append query parameters to the URL
-    String url = String(server) + "/sensors/api/data?UV=" + uv;
+    String url = String(server) + "/sensors/api/data?apiKey=" + apiKey;
+
+    JsonDocument jsonBody;
+    String jsonBodyString;
+
+    jsonBody["uv"] = "{\"UV\":\"" + String(uv) + "\"}";
+
+    serializeJson(jsonBody, jsonBodyString);
+
+    Serial.println();
+    Serial.println(url);
     http.begin(client, url);
     http.addHeader("Content-Type", "application/json");
-
-    String jsonBody = "{\"api_key\":\"" + apiKey + "\"}";
-    Serial.println(jsonBody);
-    int httpCode = http.POST(jsonBody);      
+    Serial.println(jsonBodyString);
+    int httpCode = http.POST(jsonBodyString);     
     Serial.print("HTTP result: ");
     Serial.println(httpCode);
 
