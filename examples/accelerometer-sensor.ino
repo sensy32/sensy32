@@ -56,8 +56,7 @@ void setup() {
 
   if (myIMU.begin() == false) {
     Serial.println("BNO08x not detected at default I2C address. Check your jumpers and the hookup guide. Freezing...");
-    while (1)
-      ;
+    while (1);
   }
   Serial.println("BNO08x found!");
 
@@ -97,15 +96,21 @@ void sendDataToSensy(float x, float y, float z) {
 
     HTTPClient http;
 
-    // Append query parameters to the URL
-    String url = String(server) + "/sensors/api/data?X=" + x + "&Y=" + y + "&Z=" + z;
+    String url = String(server) + "/sensors/api/data?apiKey=" + apiKey;
 
+    JsonDocument jsonBody;
+    String jsonBodyString;
+
+    jsonBody["accelerometer"] = "{\"X\":\"" + String(x) + "\",\"Y\":\"" + String(y) + "\",\"Z\":\"" + String(z) + "\"}";
+    
+    serializeJson(jsonBody, jsonBodyString);
+
+    Serial.println();
+    Serial.println(url);
     http.begin(client, url);
     http.addHeader("Content-Type", "application/json");
-
-    String jsonBody = "{\"api_key\":\"" + apiKey + "\"}";
-    Serial.println(jsonBody);
-    int httpCode = http.POST(jsonBody);     
+    Serial.println(jsonBodyString);
+    int httpCode = http.POST(jsonBodyString);     
     Serial.print("HTTP result: ");
     Serial.println(httpCode);
 
