@@ -313,11 +313,11 @@ void getPressureAltitudeData(void) {
 }
 
 void getTemperatureHumidityData(void){
-  //float temperature = mySensorTem.readTempF(); 
   temperature = mySensorTem.readTempC();
   humidity = mySensorTem.readFloatHumidity();
-  float pressure = mySensorTem.readFloatPressure();
-  float altitude = mySensorTem.readFloatAltitudeFeet();
+  pressure = (mySensorTem.readFloatPressure()/100);
+  altitude = mySensorTem.readFloatAltitudeMeters();
+  
   if (isnan(temperature) || isnan(humidity) || isnan(pressure) || isnan(altitude)) {
     Serial.println("Error reading sensor data");
     return;
@@ -328,11 +328,11 @@ void getTemperatureHumidityData(void){
 
   Serial.print(" Pressure: ");
   Serial.print(pressure, 0);
-  Serial.print(F("Pa   "));
+  Serial.print(F("hPa   "));
 
   Serial.print(" Altitude: ");
   Serial.print(altitude, 1);
-  Serial.print(F("ft   "));
+  Serial.print(F("m  "));
 
   Serial.print(" Temperature: ");
   Serial.print(temperature, 2);
@@ -513,14 +513,14 @@ void sendDataToSensy(){
       client.setInsecure();
       client.connect(server, port);
 
-      String url = String(server) + "/sensors/api/data-all-in-one?apiKey=" + apiKey;
+      String url = String(server) + "/sensors/api/data?apiKey=" + apiKey;
 
       JsonDocument jsonBody;
       String jsonBodyString;
 
       jsonBody["temperature"] = String(temperature);
-      jsonBody["humidity"] = String(humidity);;
-      jsonBody["altitude"] = String(altitude);;
+      jsonBody["humidity"] = String(humidity);
+      jsonBody["altitude"] = String(altitude);
       jsonBody["pressure"] = String(pressure);
       jsonBody["accelerometer"] = "{\"X\":\"" + String(valX) + "\",\"Y\":\"" + String(valY) + "\",\"Z\":\"" + String(valZ) + "\"}";
       jsonBody["motion"] = "{\"presenceVal\":\"" + String(presenceVal) + "\"}";
