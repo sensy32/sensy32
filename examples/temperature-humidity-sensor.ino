@@ -51,19 +51,18 @@ void setup() {
   if (mySensor.beginI2C(Wire) == false)  //Begin communication over I2C
   {
     Serial.println("The sensor did not respond. Please check wiring.");
-    while (1)
-      ;  //Freeze
+    while (1);  //Freeze
   }
 
 setupLcd();
 }
 
 void readAndSendSensorData() {
-  //float temperature = mySensor.readTempF(); 
   float temperature = mySensor.readTempC();
   float humidity = mySensor.readFloatHumidity();
-  float pressure = mySensor.readFloatPressure();
-  float altitude = mySensor.readFloatAltitudeFeet();
+  float pressure = (mySensor.readFloatPressure()/100);
+  float altitude = mySensor.readFloatAltitudeMeters();
+
   if (isnan(temperature) || isnan(humidity) || isnan(pressure) || isnan(altitude)) {
     Serial.println("Error reading sensor data");
     return;
@@ -75,11 +74,9 @@ void readAndSendSensorData() {
   Serial.print(pressure, 0);
 
   Serial.println(" Altitude: ");
-  //Serial.print(mySensor.readFloatAltitudeMeters(), 1);
   Serial.print(altitude, 1);
 
   Serial.println(" Temperature: ");
-  //Serial.print(mySensor.readTempC(), 2);
   Serial.print(temperature, 2);
 
   // Send Data to SENSY32.io
@@ -96,15 +93,24 @@ void sendDataToSensy(float temperature, float humidity, float pressure, float al
     client.connect(server, port);
 
     HTTPClient http;
+    String url = String(server) + "/sensors/api/data?apiKey=" + apiKey;
 
-    // Append query parameters to the URL
-    String url = String(server) + "/sensors/api/data?Temperature=" + temperature + "&Humidity=" + humidity + "&Pressure=" + pressure + "&Altitude=" + altitude;
+    JsonDocument jsonBody;
+    String jsonBodyString;
+
+    jsonBody["temperature"] = String(temperature);
+    jsonBody["humidity"] = String(humidity);;
+    jsonBody["altitude"] = String(altitude);;
+    jsonBody["pressure"] = String(pressure);
+
+    serializeJson(jsonBody, jsonBodyString);
+
+    Serial.println();
+    Serial.println(url);
     http.begin(client, url);
     http.addHeader("Content-Type", "application/json");
-
-    String jsonBody = "{\"api_key\":\"" + apiKey + "\"}";
-    Serial.println(jsonBody);
-    int httpCode = http.POST(jsonBody);     
+    Serial.println(jsonBodyString);
+    int httpCode = http.POST(jsonBodyString);     
     Serial.print("HTTP result: ");
     Serial.println(httpCode);
 
