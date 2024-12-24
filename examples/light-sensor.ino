@@ -126,8 +126,7 @@ void setup() {
     Serial.println(F("Found a TSL2591 sensor"));
   } else {
     Serial.println(F("No sensor found ... check your wiring?"));
-    while (1)
-      ;
+    while (1);
   }
 
   setupLcd();
@@ -216,15 +215,21 @@ void sendDataToSensy(float ir, float full, float visible, float lux) {
 
     HTTPClient http;
 
-    // Append query parameters to the URL
-    String url = String(server) + "/sensors/api/data?IR=" + ir + "&Full=" + full + "&Visible=" + visible + "&Lux=" + lux;
+    JsonDocument jsonBody;
+    String jsonBodyString;
 
+    String url = String(server) + "/sensors/api/data?apiKey=" + apiKey;
+
+    jsonBody["light"] = "{\"IR\":\"" + String(ir) + "\",\"Full\":\"" + String(full) + "\",\"Visible\":\"" + String(visible) + "\",\"Lux\":\"" + String(lux) + "\"}";
+
+    serializeJson(jsonBody, jsonBodyString);
+
+    Serial.println();
+    Serial.println(url);
     http.begin(client, url);
     http.addHeader("Content-Type", "application/json");
-
-    String jsonBody = "{\"api_key\":\"" + apiKey + "\"}";
-    Serial.println(jsonBody);
-    int httpCode = http.POST(jsonBody);     
+    Serial.println(jsonBodyString);
+    int httpCode = http.POST(jsonBodyString);     
     Serial.print("HTTP result: ");
     Serial.println(httpCode);
 
