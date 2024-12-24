@@ -70,15 +70,23 @@ void sendDataToSensy(float pressure, float altitude, float temperature) {
 
     HTTPClient http;
 
-    // Append query parameters to the URL
-    String url = String(server) + "/sensors/api/data?Pressure=" + pressure + "&Altitude=" + altitude + "&Temperature=" + temperature;
+    String url = String(server) + "/sensors/api/data?apiKey=" + apiKey;
 
+    JsonDocument jsonBody;
+    String jsonBodyString;
+
+    jsonBody["temperature"] = String(temperature);
+    jsonBody["altitude"] = String(altitude);;
+    jsonBody["pressure"] = String(pressure);
+
+    serializeJson(jsonBody, jsonBodyString);
+
+    Serial.println();
+    Serial.println(url);
     http.begin(client, url);
     http.addHeader("Content-Type", "application/json");
-
-    String jsonBody = "{\"api_key\":\"" + apiKey + "\"}";
-    Serial.println(jsonBody);
-    int httpCode = http.POST(jsonBody); 
+    Serial.println(jsonBodyString);
+    int httpCode = http.POST(jsonBodyString);     
     Serial.print("HTTP result: ");
     Serial.println(httpCode);
 
