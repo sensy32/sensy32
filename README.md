@@ -19,7 +19,7 @@ The Sensy32 board includes the following components and sensors:
 - MEMS Microphone
 
 ## Documentation
-[//]: # "You can use the [Sensy32 Documentation](https://sensy32.io/documentation) to get all information about this project."
+You can use the [Sensy32 Documentation](https://sensy32.io/documentation) to get all information about this project, Or also follow this guide step by step:
 
 ### Prerequisites
 1. Make sure to install both the **Arduino IDE** software and the **CP210xVCP Driver**:
