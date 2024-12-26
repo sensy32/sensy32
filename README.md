@@ -79,9 +79,6 @@ After adding the link, click the **OK** button.
 
 Some packages are pre-installed, and you only need to install the missing ones through the **Library Manager** (accessible from the third menu tab).
 
-- If using **all_sensors.ino**: Install all the packages listed in the screenshots.
-- If using a **specific sensor file** (e.g., temperature-humidity-sensor.ino): Refer to the file header to determine which packages are required, and install only those.
-
 *Notes*: 
 - These packages only need to be installed once. For instance, if you initially run the **all_sensors.ino** file, you won’t need to install additional packages when switching to **temperature-humidity-sensor.ino** or any other individual sensor file.
 - In the rare case you’re prompted for other packages, simply search for their names in the Library Manager and install them as shown in the examples. However, this is usually unnecessary.
