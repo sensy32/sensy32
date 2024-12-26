@@ -55,7 +55,7 @@ After adding the link, click the **OK** button.
 
 6. Now, connect your Sensy32 board to your computer using a USB Type-C cable.
 
-*Note*: This command may help you detect whether the board is successfully connected. It shows a list of specific devices or files related to serial communication on your system: **ls /dev/cu.\***
+***Note***: This command may help you detect whether the board is successfully connected. It shows a list of specific devices or files related to serial communication on your system: **ls /dev/cu.\***
 
 7. Next, click on the Sketch tab in the Arduino IDE, select Add File, and upload the **config.h** file as demonstrated in the screenshots below:
    
@@ -79,7 +79,7 @@ After adding the link, click the **OK** button.
 
 Some packages are pre-installed, and you only need to install the missing ones through the **Library Manager** (accessible from the third menu tab).
 
-*Notes*: 
+***Notes***: 
 - These packages only need to be installed once. For instance, if you initially run the **all_sensors.ino** file, you won’t need to install additional packages when switching to **temperature-humidity-sensor.ino** or any other individual sensor file.
 - In the rare case you’re prompted for other packages, simply search for their names in the Library Manager and install them as shown in the examples. However, this is usually unnecessary.
 
