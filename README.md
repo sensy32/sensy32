@@ -55,7 +55,10 @@ After adding the link, click the **OK** button.
 
 6. Now, connect your Sensy32 board to your computer using a USB Type-C cable.
 
-***Note***: This command may help you detect whether the board is successfully connected. It shows a list of specific devices or files related to serial communication on your system: **ls /dev/cu.\***
+***Note***: To detect whether the board is successfully connected. You can use the commands below based on your operating system. They show a list of specific devices or files related to serial communication on your system.
+ - MacOS: **ls /dev/cu.\***
+ - Windows: **[System.IO.Ports.SerialPort]::GetPortNames()**
+ - Ubuntu: **ls /dev/ttyUSB\***
 
 7. Next, click on the Sketch tab in the Arduino IDE, select Add File, and upload the **config.h** file as demonstrated in the screenshots below:
    
@@ -118,13 +121,26 @@ Here is an overview about the role of each package used in our code samples:
 
 10. In the top-left corner, click the **Select Board** button, then choose **Select Other Board and Port** from the dropdown menu. This will open a Popup where you need to:
     - Select **ESP32S3 Dev Module** as the board.
-    - Select **/dev/cu.SLAB_USBtoUART Serial Port (USB)** as the port.
+    - Select the serial port appropriate for your operating system: **/dev/cu.SLAB_USBtoUART Serial Port (USB)** for macOS, **COM3 Serial Port (USB)** for Windows, and **/dev/ttyUSB0** for Ubuntu.
     - Click the **OK** button.
+<img src="https://sensy32.io/static/media/code-execution-6.e14bf524b7e4d9cc4da0.png" alt="code execution 6" width="400">
 
 <p>
-   <img src="https://sensy32.io/static/media/code-execution-6.e14bf524b7e4d9cc4da0.png" alt="code execution 6" width="400">
-   <img src="https://sensy32.io/static/media/code-execution-7.6c90fd610170f3c613bb.png" alt="code execution 7" width="600"> 
+    <img src="https://sensy32.io/static/media/code-execution-7.6c90fd610170f3c613bb.png" alt="code execution 7" width="500"> 
+    <img src="https://sensy32.io/static/media/code-execution-10.309f302f361b0511abd2.png" alt="code execution 10" width="500"> 
 </p>
+
+***Note***: On Ubuntu, the Arduino IDE interface differs slightly. To install the board manager, add libraries, or select the board and port, navigate to the **Tools** menu in the top navigation bar.
+
+To install libraries you refer to the **Manage Libraries** option.
+    
+<img src="https://sensy32.io/static/media/code-execution-12.9f4337551cba4e5da098.png" alt="code execution 12" width="400"> 
+    
+You can select the board and port using the **Board** and **Port** options. To install a board manager, use the **Boards Manager** option found under the Board menu.
+    
+<img src="https://sensy32.io/static/media/code-execution-13.577d7e3d08396bba2082.png" alt="code execution 13" width="400"> 
+    
+<img src="https://sensy32.io/static/media/code-execution-14.01ad4a1391e2b2e5e580.png" alt="code execution 14" width="400"> 
 
 11. Additionally, open the **Serial Monitor** console from the **Tools** tab to view the logs in real time.
 
