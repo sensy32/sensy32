@@ -50,7 +50,7 @@ For simplicity, we will provide the device manually using the UI.
 
 Install the board for Arduino IDE:
 
-Go to **File** > **Preferences** and add the following URL to the **Additional Boards Manager URLs** field: `https://dl.espressif.com/dl/package_esp32_index.json`
+Go to **File** > **Preferences** and add the following URL to the **Additional Boards Manager URLs** field: ```https://dl.espressif.com/dl/package_esp32_index.json```
 
 <img src="assets/preferences.png" alt="Preferences" style="width: 300px;"/>
 
@@ -811,11 +811,13 @@ void loop() {
 
 <span style="color:blue;"> Don’t forget to replace placeholders with your real WiFi network SSID, password, ThingsBoard device access token. </span>
 
-`constexpr char WIFI_SSID[] = "YOUR_WIFI_SSID";`
+``` cpp
+  constexpr char WIFI_SSID[] = "YOUR_WIFI_SSID";
 
-`constexpr char WIFI_PASSWORD[] = "YOUR_WIFI_PASSWORD";`
+  constexpr char WIFI_PASSWORD[] = "YOUR_WIFI_PASSWORD";
 
-`constexpr char TOKEN[] = "YOUR_ACCESS_TOKEN";`
+  constexpr char TOKEN[] = "YOUR_ACCESS_TOKEN";
+```
 
 Then upload the code to the device by pressing the Upload button or keyboard combination Ctrl+U.
 
