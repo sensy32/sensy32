@@ -1,7 +1,7 @@
 # How to connect Sensy32 Board to ThingsBoard?
 
 ## Introduction
-<img src="carte-electro.jpg" alt="Sensy32 Board" style="width: 150px;"/>
+<img src="assets/carte-electro.jpg" alt="Sensy32 Board" style="width: 150px;"/>
 
 The Sensy32 is an IoT board designed for sensor enthusiasts, developers, and IoT creators. Powered by ESP32-S3 and packed with a wide array of sensors, it enables seamless monitoring, analysis, and visualization of real-world data.
 The Sensy32 supports Wi-Fi and Bluetooth connectivity, complemented by two USB Type-C ports that enable charging and power supply, programming and firmware uploads, data communication, peripheral connectivity, and powering external devices such as sensors.
@@ -39,10 +39,10 @@ For simplicity, we will provide the device manually using the UI.
 * Enter a **device name**, for example “My New Device”. You can leave all other fields with their default values. Click Add to add the device.
 * Your first device has been added.
 
-<img src="hello-world-1-1-provision-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
-<img src="hello-world-1-1-provision-device-2-pe.png" alt="Create Device" style="width: 300px;"/>
-<img src="hello-world-1-1-provision-device-3-pe.png" alt="Create Device" style="width: 300px;"/>
-<img src="hello-world-1-1-provision-device-4-pe.png" alt="Create Device" style="width: 300px;"/>
+<img src="assets/hello-world-1-1-provision-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
+<img src="assets/hello-world-1-1-provision-device-2-pe.png" alt="Create Device" style="width: 300px;"/>
+<img src="assets/hello-world-1-1-provision-device-3-pe.png" alt="Create Device" style="width: 300px;"/>
+<img src="assets/hello-world-1-1-provision-device-4-pe.png" alt="Create Device" style="width: 300px;"/>
 
 ## Install required libraries and tools
 
@@ -50,12 +50,12 @@ Install the board for Arduino IDE:
 
 Go to **File** > **Preferences** and add the following URL to the **Additional Boards Manager URLs** field: `https://dl.espressif.com/dl/package_esp32_index.json`
 
-<img src="preferences.png" alt="Preferences" style="width: 300px;"/>
+<img src="assets/preferences.png" alt="Preferences" style="width: 300px;"/>
 
 
 Then go to **Tools** > **Board** > **Board Manager** and install the **ESP32 by Espressif Systems** board.
 
-<img src="esp32-arduino-ide-board-manager.png" alt="Arduino Setup" style="width: 200px;"/>
+<img src="assets/esp32-arduino-ide-board-manager.png" alt="Arduino Setup" style="width: 200px;"/>
 
 After the installation is complete, select the board by Board menu: **Tools** > **Board** > **ESP32** > **ESP32S3 Dev Module**.
 
@@ -75,19 +75,19 @@ To install the needed libraries - we will need to do the following steps:
 * Enter the name of the following libraries in the search bar and click **INSTALL**: “**ThingsBoard**”, “**ss_oled**”, “**Adafruit TSL259**”, “**SparkFun BNO08x**”, “**SparkFun STHS34PF80**”, “**BMP388_DEV**”, “**SparkFun BME280**”, “**Adafruit LTR390 Library**”.
 * If prompted to install library dependencies, simply click **Install All** to ensure all necessary libraries are installed.
 
-<img src="manage-libraries.png" alt="Manage Libraries" style="width: 300px;"/>
-<img src="install-all.png" alt="Install All" style="width: 300px;"/>
+<img src="assets/manage-libraries.png" alt="Manage Libraries" style="width: 300px;"/>
+<img src="assets/install-all.png" alt="Install All" style="width: 300px;"/>
 
 <br/>
 
-<img src="library-1.png" alt="Library 1" style="width: 200px;"/>
-<img src="library-2.png" alt="Library 2" style="width: 200px;"/>
-<img src="library-3.png" alt="Library 3" style="width: 200px;"/>
-<img src="library-4.png" alt="Library 4" style="width: 200px;"/>
-<img src="library-5.png" alt="Library 5" style="width: 200px;"/>
-<img src="library-6.png" alt="Library 6" style="width: 200px;"/>
-<img src="library-7.png" alt="Library 7" style="width: 200px;"/>
-<img src="library-8.png" alt="Library 8" style="width: 200px;"/>
+<img src="assets/library-1.png" alt="Library 1" style="width: 200px;"/>
+<img src="assets/library-2.png" alt="Library 2" style="width: 200px;"/>
+<img src="assets/library-3.png" alt="Library 3" style="width: 200px;"/>
+<img src="assets/library-4.png" alt="Library 4" style="width: 200px;"/>
+<img src="assets/library-5.png" alt="Library 5" style="width: 200px;"/>
+<img src="assets/library-6.png" alt="Library 6" style="width: 200px;"/>
+<img src="assets/library-7.png" alt="Library 7" style="width: 200px;"/>
+<img src="assets/library-8.png" alt="Library 8" style="width: 200px;"/>
 
 Let’s dive deeper to see what are these libraries are used for:
 * **ThingsBoard**: This is the ThingsBoard Arduino SDK, used to connect with the ThingsBoard Platform.
@@ -111,8 +111,8 @@ To connect your device, you’ll first need to get its credentials. While Things
 * Click on the device row in the table to open device details.
 * Click “**Copy access token**”. The token will be copied to your clipboard. Please save it in a safe place.
 
-<img src="hello-world-2-1-connect-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
-<img src="hello-world-2-1-connect-device-2-pe.png" alt="Connect Device" style="width: 300px;"/>
+<img src="assets/hello-world-2-1-connect-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
+<img src="assets/hello-world-2-1-connect-device-2-pe.png" alt="Connect Device" style="width: 300px;"/>
 
 Now it’s time to program the board to read data, display it on the Sensy board LCD screen, and connect to ThingsBoard.
 
@@ -809,14 +809,14 @@ void loop() {
 
 Then upload the code to the device by pressing the Upload button or keyboard combination Ctrl+U.
 
-<img src="upload.png" alt="Upload" style="width: 250px;"/>
+<img src="assets/upload.png" alt="Upload" style="width: 250px;"/>
 
 If you cannot upload the code and receive an error: <span style="color: red;">Property 'upload.tool.serial' is undefined</span> you can do the following:
 * Go to “**Tools**” > “**Programmer**” and select “**Esptool**” as a programmer.
 * Go to “**Sketch**” > “**Upload Using Programmer**”.
 
-<img src="select-esptool-programmer.png" alt="Select Esptool programmer" style="width: 250px;"/>
-<img src="upload-using-programmer.png" alt="Upload using programmer" style="width: 250px;"/>
+<img src="assets/select-esptool-programmer.png" alt="Select Esptool programmer" style="width: 250px;"/>
+<img src="assets/upload-using-programmer.png" alt="Upload using programmer" style="width: 250px;"/>
 
 ## Check data on ThingsBoard
 
@@ -834,9 +834,9 @@ To import the ready-to-use dashboard, follow these steps:
 * In the dashboard import window, upload the JSON file and click the “**Import**” button.
 * Dashboard has been imported
 
-<img src="import-dashboard-1-pe.png" alt="Import Dashboard 1" style="width: 300px;"/>
-<img src="import-dashboard-2-pe.png" alt="Import Dashboard 2" style="width: 300px;"/>
-<img src="import-dashboard-3-pe.png" alt="Import Dashboard 3" style="width: 300px;"/>
+<img src="assets/import-dashboard-1-pe.png" alt="Import Dashboard 1" style="width: 300px;"/>
+<img src="assets/import-dashboard-2-pe.png" alt="Import Dashboard 2" style="width: 300px;"/>
+<img src="assets/import-dashboard-3-pe.png" alt="Import Dashboard 3" style="width: 300px;"/>
 
 The “My Dashboard” structure:
 * To check the data from our device we need to open the imported dashboard by clicking on it in the table.
@@ -844,7 +844,7 @@ The “My Dashboard” structure:
 
 * We can also add a Widget to display device & Wi-Fi information.
 
-<img src="my-dashboard.png" alt="My Dashboard" style="width: 400px;"/>
+<img src="assets/my-dashboard.png" alt="My Dashboard" style="width: 400px;"/>
 
 ## Conclusion
 
