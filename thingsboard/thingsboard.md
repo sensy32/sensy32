@@ -106,7 +106,7 @@ Let’s dive deeper to see what are these libraries are used for:
 * **SparkFun_BNO08x_Arduino_Library**: Simplifies interfacing with BNO08x series sensors in Arduino projects.
 * **SparkFun_STHS34PF80_Arduino_Library**: Simplifies interfacing with the STHS34PF80 sensor in Arduino projects.
 
-<span style="color: red;">All provided code examples require ThingsBoard Library version 0.14.0</span>
+:bangbang: **All provided code examples require ThingsBoard Library version 0.14.0**
 
 At this point, we have installed all required libraries and tools.
 
@@ -809,7 +809,7 @@ void loop() {
 }
 ```
 
-<span style="color:blue;"> Don’t forget to replace placeholders with your real WiFi network SSID, password, ThingsBoard device access token. </span>
+:warning: **Don’t forget to replace placeholders with your real WiFi network SSID, password, ThingsBoard device access token.**
 
 ``` cpp
   constexpr char WIFI_SSID[] = "YOUR_WIFI_SSID";
