@@ -40,10 +40,10 @@ For simplicity, we will provide the device manually using the UI.
 * Your first device has been added.
 
 <p>
-  <img src="assets/hello-world-1-1-provision-device-1-pe.png" alt="Create Device" style="width: 250px;"/>
-  <img src="assets/hello-world-1-1-provision-device-2-pe.png" alt="Create Device" style="width: 250px;"/>
-  <img src="assets/hello-world-1-1-provision-device-3-pe.png" alt="Create Device" style="width: 250px;"/>
-  <img src="assets/hello-world-1-1-provision-device-4-pe.png" alt="Create Device" style="width: 250px;"/>
+  <img src="assets/hello-world-1-1-provision-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
+  <img src="assets/hello-world-1-1-provision-device-2-pe.png" alt="Create Device" style="width: 300px;"/>
+  <img src="assets/hello-world-1-1-provision-device-3-pe.png" alt="Create Device" style="width: 300px;"/>
+  <img src="assets/hello-world-1-1-provision-device-4-pe.png" alt="Create Device" style="width: 300px;"/>
 </p>
 
 ## Install required libraries and tools
@@ -126,7 +126,7 @@ Now it’s time to program the board to read data, display it on the Sensy board
 
 To do this, you can use the code below. It contains all required functionality for this guide.
 
-``` arduino
+``` cpp
 
 #if defined(ESP8266)
 #include <ESP8266WiFi.h>
