@@ -40,10 +40,10 @@ For simplicity, we will provide the device manually using the UI.
 * Your first device has been added.
 
 <p>
-  <img src="assets/hello-world-1-1-provision-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
-  <img src="assets/hello-world-1-1-provision-device-2-pe.png" alt="Create Device" style="width: 300px;"/>
-  <img src="assets/hello-world-1-1-provision-device-3-pe.png" alt="Create Device" style="width: 300px;"/>
-  <img src="assets/hello-world-1-1-provision-device-4-pe.png" alt="Create Device" style="width: 300px;"/>
+  <img src="assets/hello-world-1-1-provision-device-1-pe.png" alt="Create Device" style="width: 250px;"/>
+  <img src="assets/hello-world-1-1-provision-device-2-pe.png" alt="Create Device" style="width: 250px;"/>
+  <img src="assets/hello-world-1-1-provision-device-3-pe.png" alt="Create Device" style="width: 250px;"/>
+  <img src="assets/hello-world-1-1-provision-device-4-pe.png" alt="Create Device" style="width: 250px;"/>
 </p>
 
 ## Install required libraries and tools
@@ -812,7 +812,9 @@ void loop() {
 <span style="color:blue;"> Don’t forget to replace placeholders with your real WiFi network SSID, password, ThingsBoard device access token. </span>
 
 `constexpr char WIFI_SSID[] = "YOUR_WIFI_SSID";`
+
 `constexpr char WIFI_PASSWORD[] = "YOUR_WIFI_PASSWORD";`
+
 `constexpr char TOKEN[] = "YOUR_ACCESS_TOKEN";`
 
 Then upload the code to the device by pressing the Upload button or keyboard combination Ctrl+U.
