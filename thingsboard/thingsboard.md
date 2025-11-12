@@ -39,10 +39,12 @@ For simplicity, we will provide the device manually using the UI.
 * Enter a **device name**, for example “My New Device”. You can leave all other fields with their default values. Click Add to add the device.
 * Your first device has been added.
 
-<img src="assets/hello-world-1-1-provision-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
-<img src="assets/hello-world-1-1-provision-device-2-pe.png" alt="Create Device" style="width: 300px;"/>
-<img src="assets/hello-world-1-1-provision-device-3-pe.png" alt="Create Device" style="width: 300px;"/>
-<img src="assets/hello-world-1-1-provision-device-4-pe.png" alt="Create Device" style="width: 300px;"/>
+<p>
+  <img src="assets/hello-world-1-1-provision-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
+  <img src="assets/hello-world-1-1-provision-device-2-pe.png" alt="Create Device" style="width: 300px;"/>
+  <img src="assets/hello-world-1-1-provision-device-3-pe.png" alt="Create Device" style="width: 300px;"/>
+  <img src="assets/hello-world-1-1-provision-device-4-pe.png" alt="Create Device" style="width: 300px;"/>
+</p>
 
 ## Install required libraries and tools
 
@@ -75,19 +77,23 @@ To install the needed libraries - we will need to do the following steps:
 * Enter the name of the following libraries in the search bar and click **INSTALL**: “**ThingsBoard**”, “**ss_oled**”, “**Adafruit TSL259**”, “**SparkFun BNO08x**”, “**SparkFun STHS34PF80**”, “**BMP388_DEV**”, “**SparkFun BME280**”, “**Adafruit LTR390 Library**”.
 * If prompted to install library dependencies, simply click **Install All** to ensure all necessary libraries are installed.
 
-<img src="assets/manage-libraries.png" alt="Manage Libraries" style="width: 300px;"/>
-<img src="assets/install-all.png" alt="Install All" style="width: 300px;"/>
+<p>
+  <img src="assets/manage-libraries.png" alt="Manage Libraries" style="width: 300px;"/>
+  <img src="assets/install-all.png" alt="Install All" style="width: 300px;"/>
+</p>
 
 <br/>
 
-<img src="assets/library-1.png" alt="Library 1" style="width: 200px;"/>
-<img src="assets/library-2.png" alt="Library 2" style="width: 200px;"/>
-<img src="assets/library-3.png" alt="Library 3" style="width: 200px;"/>
-<img src="assets/library-4.png" alt="Library 4" style="width: 200px;"/>
-<img src="assets/library-5.png" alt="Library 5" style="width: 200px;"/>
-<img src="assets/library-6.png" alt="Library 6" style="width: 200px;"/>
-<img src="assets/library-7.png" alt="Library 7" style="width: 200px;"/>
-<img src="assets/library-8.png" alt="Library 8" style="width: 200px;"/>
+<p>
+  <img src="assets/library-1.png" alt="Library 1" style="width: 200px;"/>
+  <img src="assets/library-2.png" alt="Library 2" style="width: 200px;"/>
+  <img src="assets/library-3.png" alt="Library 3" style="width: 200px;"/>
+  <img src="assets/library-4.png" alt="Library 4" style="width: 200px;"/>
+  <img src="assets/library-5.png" alt="Library 5" style="width: 200px;"/>
+  <img src="assets/library-6.png" alt="Library 6" style="width: 200px;"/>
+  <img src="assets/library-7.png" alt="Library 7" style="width: 200px;"/>
+  <img src="assets/library-8.png" alt="Library 8" style="width: 200px;"/>
+</p>
 
 Let’s dive deeper to see what are these libraries are used for:
 * **ThingsBoard**: This is the ThingsBoard Arduino SDK, used to connect with the ThingsBoard Platform.
@@ -111,8 +117,10 @@ To connect your device, you’ll first need to get its credentials. While Things
 * Click on the device row in the table to open device details.
 * Click “**Copy access token**”. The token will be copied to your clipboard. Please save it in a safe place.
 
-<img src="assets/hello-world-2-1-connect-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
-<img src="assets/hello-world-2-1-connect-device-2-pe.png" alt="Connect Device" style="width: 300px;"/>
+<p>
+  <img src="assets/hello-world-2-1-connect-device-1-pe.png" alt="Create Device" style="width: 300px;"/>
+  <img src="assets/hello-world-2-1-connect-device-2-pe.png" alt="Connect Device" style="width: 300px;"/>
+</p>
 
 Now it’s time to program the board to read data, display it on the Sensy board LCD screen, and connect to ThingsBoard.
 
@@ -815,8 +823,10 @@ If you cannot upload the code and receive an error: <span style="color: red;">Pr
 * Go to “**Tools**” > “**Programmer**” and select “**Esptool**” as a programmer.
 * Go to “**Sketch**” > “**Upload Using Programmer**”.
 
-<img src="assets/select-esptool-programmer.png" alt="Select Esptool programmer" style="width: 250px;"/>
-<img src="assets/upload-using-programmer.png" alt="Upload using programmer" style="width: 250px;"/>
+<p>
+  <img src="assets/select-esptool-programmer.png" alt="Select Esptool programmer" style="width: 250px;"/>
+  <img src="assets/upload-using-programmer.png" alt="Upload using programmer" style="width: 250px;"/>
+</p>
 
 ## Check data on ThingsBoard
 
@@ -834,9 +844,11 @@ To import the ready-to-use dashboard, follow these steps:
 * In the dashboard import window, upload the JSON file and click the “**Import**” button.
 * Dashboard has been imported
 
-<img src="assets/import-dashboard-1-pe.png" alt="Import Dashboard 1" style="width: 300px;"/>
-<img src="assets/import-dashboard-2-pe.png" alt="Import Dashboard 2" style="width: 300px;"/>
-<img src="assets/import-dashboard-3-pe.png" alt="Import Dashboard 3" style="width: 300px;"/>
+<p>
+  <img src="assets/import-dashboard-1-pe.png" alt="Import Dashboard 1" style="width: 300px;"/>
+  <img src="assets/import-dashboard-2-pe.png" alt="Import Dashboard 2" style="width: 300px;"/>
+  <img src="assets/import-dashboard-3-pe.png" alt="Import Dashboard 3" style="width: 300px;"/>
+</p>
 
 The “My Dashboard” structure:
 * To check the data from our device we need to open the imported dashboard by clicking on it in the table.
