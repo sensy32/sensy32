@@ -29,7 +29,7 @@ After this we will modify our code and upload it to the device, and check the re
 To continue with this guide, we will need the following:
 * [Arduino IDE][1]
 * [CP210xVCP Driver][2]
-* Sensy32 board
+* Sensy32 board (you can get it from [Tindie][8] or [Elecrow][9])
 * [ThingsBoard Cloud (Europe)][3] or [ThingsBoard Cloud (America)][4]
 
 ## Create device on ThingsBoard
@@ -57,7 +57,7 @@ Go to **File** > **Preferences** and add the following URL to the **Additional B
 
 Then go to **Tools** > **Board** > **Board Manager** and install the **ESP32 by Espressif Systems** board.
 
-<img src="assets/esp32-arduino-ide-board-manager.png" alt="Arduino Setup" style="width: 200px;"/>
+<img src="assets/esp32-arduino-ide-board-manager.png" alt="Arduino Setup" style="width: 300px;"/>
 
 After the installation is complete, select the board by Board menu: **Tools** > **Board** > **ESP32** > **ESP32S3 Dev Module**.
 
@@ -70,6 +70,12 @@ Port depends on operation system and may be different:
 * for Windows - **COM**X.
 
 Where X - some number, that was assigned by your system.
+
+<p>
+  <img src="assets/esp32-s3-dev-module.png" alt="ESP32 S3 Dev Module" style="width: 300px;"/>
+  <img src="assets/esp32-s3-dev-module-port.png" alt="ESP32 S3 Dev Module & Port" style="width: 300px;"/>
+</p>
+
 
 To install the needed libraries - we will need to do the following steps:
 
@@ -85,14 +91,14 @@ To install the needed libraries - we will need to do the following steps:
 <br/>
 
 <p>
-  <img src="assets/library-1.png" alt="Library 1" style="width: 200px;"/>
-  <img src="assets/library-2.png" alt="Library 2" style="width: 200px;"/>
-  <img src="assets/library-3.png" alt="Library 3" style="width: 200px;"/>
-  <img src="assets/library-4.png" alt="Library 4" style="width: 200px;"/>
-  <img src="assets/library-5.png" alt="Library 5" style="width: 200px;"/>
-  <img src="assets/library-6.png" alt="Library 6" style="width: 200px;"/>
-  <img src="assets/library-7.png" alt="Library 7" style="width: 200px;"/>
-  <img src="assets/library-8.png" alt="Library 8" style="width: 200px;"/>
+  <img src="assets/library-1.png" alt="Library 1" style="width: 300px;"/>
+  <img src="assets/library-2.png" alt="Library 2" style="width: 300px;"/>
+  <img src="assets/library-3.png" alt="Library 3" style="width: 300px;"/>
+  <img src="assets/library-4.png" alt="Library 4" style="width: 300px;"/>
+  <img src="assets/library-5.png" alt="Library 5" style="width: 300px;"/>
+  <img src="assets/library-6.png" alt="Library 6" style="width: 300px;"/>
+  <img src="assets/library-7.png" alt="Library 7" style="width: 300px;"/>
+  <img src="assets/library-8.png" alt="Library 8" style="width: 300px;"/>
 </p>
 
 Let’s dive deeper to see what are these libraries are used for:
@@ -843,7 +849,7 @@ In this example we will upload a ready-to-use dashboard. You can also customize 
 
 To import the ready-to-use dashboard, follow these steps:
 
-* First download the My Dashboard file.
+* First download the [My Dashboard](assets/my_dashboard.json) file.
 * Navigate to the “**Dashboards**” page. By default, you navigate to the dashboard group “All”. Click on the “+” icon in the top right corner. Select “**Import dashboard**”.
 * In the dashboard import window, upload the JSON file and click the “**Import**” button.
 * Dashboard has been imported
@@ -860,7 +866,7 @@ The “My Dashboard” structure:
 
 * We can also add a Widget to display device & Wi-Fi information.
 
-<img src="assets/my-dashboard.png" alt="My Dashboard" style="width: 400px;"/>
+<img src="assets/my-dashboard.png" alt="My Dashboard" style="width: 500px;"/>
 
 ## Conclusion
 
@@ -876,3 +882,5 @@ To go further, explore the [ThingsBoard documentation][5] to learn more about ke
 [5]: https://thingsboard.io/docs/pe/
 [6]: https://thingsboard.io/docs/pe/user-guide/dashboards/
 [7]: https://thingsboard.io/docs/pe/user-guide/alarms/
+[8]: https://www.tindie.com/products/sensy32/sensy32-all-in-one-sensor-iot-board-with-lcd/
+[9]: https://www.elecrow.com/
