@@ -93,7 +93,11 @@ constexpr char WIFI_PASSWORD[] = "YOUR_WIFI_PASSWORD";
 constexpr char TOKEN[] = "YOUR_DEVICE_ACCESS_TOKEN";
 
 // Thingsboard we want to establish a connection too
+// use the below: if you are using ThingsBoard Cloud (America)
 constexpr char THINGSBOARD_SERVER[] = "thingsboard.cloud";
+// use the below: if you are using ThingsBoard Cloud (Europe)
+// constexpr char THINGSBOARD_SERVER[] = "eu.thingsboard.cloud";
+
 // MQTT port used to communicate with the server, 1883 is the default unencrypted MQTT port.
 constexpr uint16_t THINGSBOARD_PORT = 1883U;
 

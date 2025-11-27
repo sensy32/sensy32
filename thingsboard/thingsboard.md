@@ -229,7 +229,11 @@ constexpr char WIFI_PASSWORD[] = "YOUR_WIFI_PASSWORD";
 constexpr char TOKEN[] = "YOUR_DEVICE_ACCESS_TOKEN";
 
 // Thingsboard we want to establish a connection too
+// use the below: if you are using ThingsBoard Cloud (America)
 constexpr char THINGSBOARD_SERVER[] = "thingsboard.cloud";
+// use the below: if you are using ThingsBoard Cloud (Europe)
+// constexpr char THINGSBOARD_SERVER[] = "eu.thingsboard.cloud";
+
 // MQTT port used to communicate with the server, 1883 is the default unencrypted MQTT port.
 constexpr uint16_t THINGSBOARD_PORT = 1883U;
 
@@ -849,7 +853,7 @@ In this example we will upload a ready-to-use dashboard. You can also customize 
 
 To import the ready-to-use dashboard, follow these steps:
 
-* First download the [My Dashboard](assets/my_dashboard.json) file.
+* First download the [My Dashboard](https://drive.google.com/file/d/1qVFqWqHM2KvrKW-HuaUi_2oE_9Zj4cI1/view?usp=sharing) file.
 * Navigate to the “**Dashboards**” page. By default, you navigate to the dashboard group “All”. Click on the “+” icon in the top right corner. Select “**Import dashboard**”.
 * In the dashboard import window, upload the JSON file and click the “**Import**” button.
 * Dashboard has been imported
