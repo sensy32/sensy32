@@ -853,7 +853,7 @@ In this example we will upload a ready-to-use dashboard. You can also customize 
 
 To import the ready-to-use dashboard, follow these steps:
 
-* First download the [My Dashboard](https://drive.google.com/file/d/1qVFqWqHM2KvrKW-HuaUi_2oE_9Zj4cI1/view?usp=sharing) file.
+* First download the [Demo Dashboard](https://drive.google.com/file/d/10mvYVnnn0jXfshUQUJEDo9dC13QtCj_E/view?usp=sharing) file.
 * Navigate to the “**Dashboards**” page. By default, you navigate to the dashboard group “All”. Click on the “+” icon in the top right corner. Select “**Import dashboard**”.
 * In the dashboard import window, upload the JSON file and click the “**Import**” button.
 * Dashboard has been imported
